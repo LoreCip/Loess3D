@@ -51,7 +51,7 @@ program loess3d
     npoints = int(ceiling(frac*totL))
     d = 2*(degree**2 + 1)
 
-    allocate(Oout(totL), Wout(totL), dist(totL))
+    allocate(Oout(totL), Wout(totL), dist(totL), Tinds(totL))
     allocate(dist_weights(npoints), Ofit(npoints), aerr(npoints),   \
              uu(npoints), biweights(npoints), tot_weights(npoints), \
              bad(npoints), bad_old(npoints), inds(npoints))

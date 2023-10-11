@@ -2,7 +2,7 @@ import numpy as np
 
 np.random.seed(00000)
 
-n, m, l = [30]*3
+n, m, l = 6,308,81
 
 x, y, z = np.linspace(0, 1, n), np.linspace(0, 1, m), np.linspace(0, 1, l)
 X, Y, Z = np.meshgrid(x, y, z)

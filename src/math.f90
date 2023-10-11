@@ -1,5 +1,5 @@
 module mathFunc
-
+    use omp_lib
     use iso_fortran_env, only: RK => real64
     implicit none (type, external)
     
@@ -105,7 +105,7 @@ contains
         do i = 1, length
             indices(i) = i
         end do
-      
+
         stepsize = 1
         do while (stepsize.lt.length)
             do left= 1, length-stepsize, stepsize*2
