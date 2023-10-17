@@ -21,7 +21,7 @@ with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(S
 X, Y, Z = np.meshgrid(ye, lognb, logtmp)
 f_ran = entropy.copy()
 
-with open('data.dat', 'w') as f:
+with open('data.init', 'w') as f:
 
     f.write(f"{n}\t{m}\t{l}\n")
     for arr in [X, Y, Z, f_ran]:
