@@ -1,14 +1,25 @@
 import numpy as np
 
-np.random.seed(00000)
+import h5py as h5
+import matplotlib.pyplot as plt
 
-n, m, l = [60, 150, 81]
+with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
 
-x, y, z = np.linspace(0, 1, n), np.linspace(0, 1, m), np.linspace(0, 1, l)
-X, Y, Z = np.meshgrid(x, y, z)
+    n, m, l = int(f['pointsye'][()]), int(f['pointsrho'][()]), int(f['pointstemp'][()])
 
-f = X**2 + Y**2 + Z**2
-f_ran = np.random.normal(f, 0.1)
+    points = np.arange(m)
+    p1 = points[points<3*m/4]
+    p2 = points[points>=3*m/4]
+    points=np.concatenate((p1[::2], p2))
+    m = len(points)
+
+    logtmp = f['logtemp'][()]
+    lognb  = np.log10(f['nb'][()][points])
+    ye     = f['ye'][()]
+    entropy= f['entropy'][()][:, :, points]
+
+X, Y, Z = np.meshgrid(ye, lognb, logtmp)
+f_ran = entropy.copy()
 
 with open('data.dat', 'w') as f:
 
