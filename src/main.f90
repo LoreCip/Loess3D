@@ -60,7 +60,7 @@ program loess3d
     CALL system_clock(count_rate=rate)
     call SYSTEM_CLOCK(iTimes1)
 
-    !$OMP PARALLEL DO DEFAULT(PRIVATE) SHARED(totL, d, npoints, x, y, z, O, Oout, Wout)
+    !$OMP PARALLEL DO DEFAULT(PRIVATE) SHARED(Oout, Wout)
     do j = 1, size(x)
 
         xj = x(j)
