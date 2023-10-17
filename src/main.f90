@@ -10,20 +10,15 @@ program loess3d
     implicit none (type, external)
 
     ! Physical parameters
-
-    real(RK), dimension(:), allocatable :: x, y, z, O, Oout, Wout, Ofit
+    real(RK) :: f, w
+    real(RK), dimension(:), allocatable :: x, y, z, O, Oout, Wout
     integer  :: totL, npoints, n, l, m
     
     real(RK), parameter :: frac = 0.1
     integer, parameter :: degree = 1
 
     ! Computational parameters
-
-    real(RK), dimension(:), allocatable :: dist, dist_weights, aerr, uu, biweights, tot_weights, coeff
-    real(RK) :: xj, yj, zj, mad 
-    logical, dimension(:), allocatable :: bad, bad_old
-    integer, dimension(:), allocatable :: inds, Tinds
-    integer  :: j, p, d
+    integer  :: j, d
 
     integer :: num_args
     character(len=4096), dimension(2) :: args
@@ -51,60 +46,24 @@ program loess3d
     npoints = int(ceiling(frac*totL))
     d = 2*(degree**2 + 1)
 
-    allocate(Oout(totL), Wout(totL), dist(totL), Tinds(totL))
-    allocate(dist_weights(npoints), Ofit(npoints), aerr(npoints),   \
-             uu(npoints), biweights(npoints), tot_weights(npoints), \
-             bad(npoints), bad_old(npoints), inds(npoints))
-    allocate(coeff(d))
+    allocate(Oout(totL), Wout(totL))
 
     CALL system_clock(count_rate=rate)
     call SYSTEM_CLOCK(iTimes1)
 
-    !$OMP PARALLEL DO DEFAULT(PRIVATE) SHARED(Oout, Wout)
-    do j = 1, size(x)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(j, f, w) NUM_THREADS(8)
+    do j = 1, totL
 
-        xj = x(j)
-        yj = y(j)
-        zj = z(j)
+        call compute_loess(j, totL, npoints, d, x, y, z, O, f, w)
+        Oout(j) = f
+        Wout(j) = w
 
-        dist = sqrt( (x(:) - xj)**2_RK + (y(:) - yj)**2_RK + (z(:) - zj)**2_RK )
-        call merge_argsort(totL, dist, Tinds)
-        inds = Tinds(:npoints)  
-        dist_weights = (1_RK - (dist(inds) / dist(inds(npoints)))**3_RK )**3_RK
-        
-        call comp_Ofit(npoints, x(inds), y(inds), z(inds), O(inds), d, dist_weights, Ofit, coeff)
-
-        bad(:) = .false.
-        do p = 1, 10
-            aerr(:) = abs(Ofit(:) - O(inds))
-            call Median(npoints, aerr, mad)
-            uu = ( aerr(:) / (6_RK*mad) )**2_RK
-            
-            uu(:) = max(0.0_RK, min(uu(:), 1.0_RK))
-
-            biweights(:) = (1 - uu(:))**2
-            tot_weights(:) = dist_weights(:)*biweights(:)
-
-            call comp_Ofit(npoints, x(inds), y(inds), z(inds), O(inds), d, tot_weights, Ofit, coeff)
-
-            bad_old(:) = bad(:)
-            bad(:) = (biweights(:).lt.0.34_RK)
-
-            if (all(bad.eqv.bad_old)) then
-                exit
-            end if
-        end do
-
-        Oout(j) = Ofit(1)
-        Wout(j) = biweights(1)
     end do
     !$OMP END PARALLEL DO
 
     call saveOutput(O, Oout, Wout, x, y, z, n, l, m, totL, args(2))
     
-    deallocate(dist_weights, Ofit, aerr, uu, biweights,    \
-               tot_weights, coeff, bad, bad_old, dist, inds)
-    deallocate(x, y, z, O, Oout, Wout, Tinds)
+    deallocate(x, y, z, O, Oout, Wout)
 
     call SYSTEM_CLOCK(iTimes2)
     systemtime = real(iTimes2-iTimes1)/real(rate)

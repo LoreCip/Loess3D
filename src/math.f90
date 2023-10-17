@@ -5,13 +5,64 @@ module mathFunc
     
 contains
 
-    subroutine comp_Ofit(npoints, x, y, z, O, d, weights, Ofit, coeff)
+    subroutine compute_loess(j, totL, npoints, d, x, y, z, O, fit, w)
+
+        integer, intent(in) :: j, totL, npoints, d
+        real(RK), dimension(totL), intent(in) :: x, y, z, O
+        real(RK), intent(out) :: fit, w
+
+        real(RK), dimension(totL)    :: dist
+        real(RK), dimension(npoints) :: dist_weights, aerr, uu, biweights, tot_weights, Ofit
+        real(RK) :: xj, yj, zj, mad
+        logical, dimension(npoints) :: bad, bad_old
+        integer, dimension(npoints) :: inds
+        integer, dimension(totL)    :: Tinds
+        integer  :: p
+
+        xj = x(j)
+        yj = y(j)
+        zj = z(j)
+
+        dist = sqrt( (x(:) - xj)**2_RK + (y(:) - yj)**2_RK + (z(:) - zj)**2_RK )
+        call merge_argsort(totL, dist, Tinds)
+        inds = Tinds(:npoints)
+        dist_weights = (1_RK - (dist(inds) / dist(inds(npoints)))**3_RK )**3_RK
+
+        call comp_Ofit(npoints, x(inds), y(inds), z(inds), O(inds), d, dist_weights, Ofit)
+
+        bad(:) = .false.
+        do p = 1, 10
+            aerr(:) = abs(Ofit(:) - O(inds))
+            call Median(npoints, aerr, mad)
+            uu = ( aerr(:) / (6_RK*mad) )**2_RK
+
+            uu(:) = max(0.0_RK, min(uu(:), 1.0_RK))
+
+            biweights(:) = (1_RK - uu(:))**2_RK
+            tot_weights(:) = dist_weights(:)*biweights(:)
+
+            call comp_Ofit(npoints, x(inds), y(inds), z(inds), O(inds), d, tot_weights, Ofit)
+
+            bad_old(:) = bad(:)
+            bad(:) = (biweights(:).lt.0.34_RK)
+
+            if (all(bad.eqv.bad_old)) then
+                exit
+            end if
+        end do
+
+        fit = Ofit(1)
+        w = biweights(1)
+
+    end subroutine compute_loess
+
+    subroutine comp_Ofit(npoints, x, y, z, O, d, weights, Ofit)
         
         integer, intent(in) :: npoints, d
         real(RK), dimension(npoints), intent(in) :: x, y, z, O, weights
         real(RK), dimension(npoints), intent(out) :: Ofit
-        real(RK), dimension(d), intent(out) :: coeff
-
+        
+        real(RK), dimension(d) :: coeff
         real(RK), dimension(npoints, d) :: a
 
         call comp_a(npoints, x, y, z, d, a)

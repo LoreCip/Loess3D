@@ -1,18 +1,14 @@
 import numpy as np
 
-import h5py as h5
+np.random.seed(00000)
 
-with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
+n, m, l = [60, 150, 81]
 
-    logtmp = f['logtemp'][()]
-    lognb  = np.log10(f['nb'][()])
-    ye     = f['ye'][()]
-    entropy= f['entropy'][()]
+x, y, z = np.linspace(0, 1, n), np.linspace(0, 1, m), np.linspace(0, 1, l)
+X, Y, Z = np.meshgrid(x, y, z)
 
-    n, m, l = int(f['pointsye'][()]), int(f['pointsrho'][()]), int(f['pointstemp'][()])
-
-X, Y, Z = np.meshgrid(ye, lognb, logtmp)
-f_ran = entropy.copy()
+f = X**2 + Y**2 + Z**2
+f_ran = np.random.normal(f, 0.1)
 
 with open('data.dat', 'w') as f:
 
