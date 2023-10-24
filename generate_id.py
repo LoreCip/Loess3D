@@ -18,7 +18,7 @@ with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(S
     ye     = f['ye'][()]
     entropy= f['entropy'][()][:, :, points]
 
-X, Y, Z = np.meshgrid(ye, lognb, logtmp)
+X, Y, Z = np.meshgrid(ye, logtmp, lognb)
 f_ran = entropy.copy()
 
 with open('data.init', 'w') as f:
