@@ -18,7 +18,7 @@ program loess3d
     integer, parameter :: degree = 1
 
     ! Computational parameters
-    integer  :: j, d
+    integer  :: j, d, Nth
 
     integer :: num_args
     character(len=4096), dimension(2) :: args
@@ -39,7 +39,7 @@ program loess3d
         end if
     end do
 
-    call readParams(args(1), totL, n, l, m)
+    call readParams(args(1), totL, n, l, m, Nth)
     allocate(x(totL), y(totL), z(totL), O(totL))
     call readData(args(1), totL, x, y, z, O)
 
@@ -51,7 +51,7 @@ program loess3d
     CALL system_clock(count_rate=rate)
     call SYSTEM_CLOCK(iTimes1)
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(j, f, w) NUM_THREADS(8)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(j, f, w) NUM_THREADS(Nth)
     do j = 1, totL
 
         call compute_loess(j, totL, npoints, d, x, y, z, O, f, w)

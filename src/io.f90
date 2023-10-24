@@ -5,14 +5,18 @@ module ioFunc
     
 contains
 
-    subroutine readParams(fpath, totL, n, l, m)
+    subroutine readParams(fpath, totL, n, l, m, Nth)
         character(4096), intent(in) :: fpath
-        integer, intent(out) :: totL, n, l, m
+        integer, intent(out) :: totL, n, l, m, Nth
 
         integer :: nu, ios
 
         open(newunit=nu, file = fpath, status='old', iostat=ios)
         if ( ios /= 0 ) stop "Error opening data file."
+
+        ! Read Nth
+        read(nu, *, iostat=ios) Nth
+        if (ios /= 0) STOP "Error while reading Nth from data file."
 
         ! Read n, m, l
         read(nu, *, iostat=ios) n, m, l

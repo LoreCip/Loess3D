@@ -1,7 +1,10 @@
+import sys
+
 import numpy as np
 
 import h5py as h5
-import matplotlib.pyplot as plt
+
+Nth = sys.argv[1]
 
 with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
 
@@ -23,6 +26,7 @@ f_ran = entropy.copy()
 
 with open('data.init', 'w') as f:
 
+    f.write(f"{Nth}")
     f.write(f"{n}\t{m}\t{l}\n")
     for arr in [X, Y, Z, f_ran]:
         arr = arr.flatten()
