@@ -37,7 +37,9 @@ contains
         open(newunit=nu, file = fpath, status='old', iostat=ios)
         if ( ios /= 0 ) stop "Error opening data file."
 
-        ! Read n, m, l
+        ! Skip Nth, n, m, l
+        read(nu, *, iostat=ios) nd
+        if (ios /= 0) STOP "Error skipping reading Nth from data file."
         read(nu, *, iostat=ios) nd, md, ld
         if (ios /= 0) STOP "Error skipping reading n,m,l from data file."
 
