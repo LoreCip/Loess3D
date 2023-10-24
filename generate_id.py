@@ -10,16 +10,16 @@ with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(S
 
     n, m, l = int(f['pointsye'][()]), int(f['pointstemp'][()]), int(f['pointsrho'][()])
 
-    points = np.arange(m)
-    p1 = points[points<3*m/4]
-    p2 = points[points>=3*m/4]
+    points = np.arange(l)
+    p1 = points[points<3*l/4]
+    p2 = points[points>=3*l/4]
     points=np.concatenate((p1[::2], p2))
-    m = len(points)
+    l = len(points)
 
     logtmp = f['logtemp'][()]
     lognb  = np.log10(f['nb'][()][points])
     ye     = f['ye'][()]
-    entropy= f['entropy'][()][:, :, points]
+    entropy= np.log10(f['entropy'][()][:, :, points])
 
 X, Y, Z = np.meshgrid(ye, logtmp, lognb)
 f_ran = entropy.copy()
