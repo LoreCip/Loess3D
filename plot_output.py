@@ -23,8 +23,8 @@ f_out = f_out.reshape(n, m, l)
 
 layout = go.Layout(width = 700, height =700)
  
-fig = go.Figure(data=[go.Surface(x = X[:,:,0], y = Y[:,:,0], z=f_out[:,:,0], colorscale = 'Blues')], layout=layout)
+fig = go.Figure(data=[go.Surface(x = X[:,:,0], y = Y[:,:,0], z=f_in[:,:,0], colorscale = 'Blues')], layout=layout)
  
-fig.add_scatter3d(x=X[:,:,0].flatten(), y=Y[:,:,0].flatten(), z = f_in[:,:,0].flatten(), mode='markers', marker=dict(size=5, colorscale='Reds'))
+fig.add_scatter3d(x=X[:,:,0].flatten(), y=Y[:,:,0].flatten(), z = f_out[:,:,0].flatten(), mode='markers', marker=dict(size=5, colorscale='Reds'))
  
 fig.show()
