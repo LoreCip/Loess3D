@@ -8,7 +8,7 @@ Nth = sys.argv[1]
 
 with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
 
-    n, m, l = int(f['pointsye'][()]), int(f['pointsrho'][()]), int(f['pointstemp'][()])
+    n, m, l = int(f['pointsye'][()]), int(f['pointstemp'][()]), int(f['pointsrho'][()])
 
     points = np.arange(m)
     p1 = points[points<3*m/4]
