@@ -1,10 +1,12 @@
 program loess3d
 
+    use hdf5
     use iso_fortran_env, only: RK => real64
 
     use OMP_LIB
     
     use ioFunc
+    use ioH5
     use mathFunc
     
     implicit none (type, external)
