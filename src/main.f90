@@ -18,6 +18,7 @@ program loess3d
     integer, parameter :: degree = 1
 
     ! Computational parameters
+    integer(hid_t) :: file_id
     integer  :: j, d, Nth, status
 
     integer :: num_args
