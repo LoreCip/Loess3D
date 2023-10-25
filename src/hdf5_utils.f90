@@ -11,18 +11,11 @@ contains
 
         integer,                   intent(in) :: n, m, l, totL
         real(RK), dimension(totL), intent(in) :: X, Y, Z, Oin
-
+      
         character(len=*), intent(in)  :: file_name
         integer(hid_t)  , intent(out) :: file_id
-
-        integer(hid_t) :: dataspace_id, dataset_id, plist_id
-        integer(C_INT) :: rank
-        integer(8) :: dims(1)
-        integer(hsize_t) :: cdims(1)
-        INTEGER(HSIZE_T), PARAMETER  :: xshape(0) = 0
-
+        
         integer :: status
-        character(len=500) :: dataset_name
 
         ! Open the HDF5 library
         call h5open_f(status)
