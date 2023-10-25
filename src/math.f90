@@ -77,7 +77,7 @@ contains
         real(RK), dimension(npoints), intent(in) :: x, y, z
         real(RK), dimension(npoints, d), intent(out) :: a
         
-        a(:, 1) = 1
+        a(:, 1) = 1_RK
         a(:, 2) = x
         a(:, 3) = y
         a(:, 4) = z
@@ -85,9 +85,9 @@ contains
             a(:, 5) = x*y
             a(:, 6) = x*z
             a(:, 7) = y*z
-            a(:, 8) = x**2
-            a(:, 9) = y**2
-            a(:, 10) = z**2
+            a(:, 8) = x**2_RK
+            a(:, 9) = y**2_RK
+            a(:, 10) = z**2_RK
         end if
 
     end subroutine comp_a
@@ -102,7 +102,7 @@ contains
         real(RK), dimension(npoints) :: sqw
         real(RK), dimension(npoints, d) :: LHS
 
-        integer :: i
+        integer :: i, j
 
         ! LAPACK
         real(RK), dimension(npoints) :: b
@@ -113,8 +113,10 @@ contains
         sqw = sqrt(weights)
 
         lwork = 132
-        do i = 1, npoints
-            LHS(i,:) = a(i,:)*sqw(i)
+        do j = 1, d
+            do i = 1, npoints
+                LHS(i,j) = a(i,j)*sqw(i)
+            end do
         end do
         b(:) = O(:)*sqw(:)
         

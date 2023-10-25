@@ -18,7 +18,7 @@ program loess3d
     integer, parameter :: degree = 1
 
     ! Computational parameters
-    integer  :: j, d, Nth
+    integer  :: j, d, Nth, status
 
     integer :: num_args
     character(len=4096), dimension(2) :: args
@@ -48,6 +48,8 @@ program loess3d
 
     allocate(Oout(totL), Wout(totL))
 
+    call create_hdf5_file(args(2), n, m, l, totL, x, y, z, O, file_id)
+
     CALL system_clock(count_rate=rate)
     call SYSTEM_CLOCK(iTimes1)
 
@@ -61,14 +63,15 @@ program loess3d
     end do
     !$OMP END PARALLEL DO
 
-    call saveOutput(O, Oout, Wout, x, y, z, n, l, m, totL, args(2))
-    
-    deallocate(x, y, z, O, Oout, Wout)
-
     call SYSTEM_CLOCK(iTimes2)
     systemtime = real(iTimes2-iTimes1)/real(rate)
     write(*, *) "Total system runtime:", systemtime, " seconds."
     write(*, *) "System runtime for iteration:", systemtime/totL, " seconds."
     
+    call write_real_1d_array(Oout, "f_out", file_id, status)
+    call close_hdf5_file(file_id)
+
+    deallocate(x, y, z, O, Oout, Wout)
+
     stop
 end program loess3d

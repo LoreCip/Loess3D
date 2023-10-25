@@ -9,7 +9,7 @@ BIN_DIR = bin
 EXECUTABLE = $(BIN_DIR)/run
 
 F90_FILES := $(wildcard src/*.f90)
-FCOMP = gfortran
+FCOMP = h5fc
 
 OBJECTS := $(patsubst   src/%.f90, $(OBJECTS_DIR)/%.o, $(F90_FILES))
 
