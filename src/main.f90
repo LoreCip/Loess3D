@@ -34,7 +34,7 @@ program loess3d
             if (j.eq.1) then
                 args(j) = 'data.dat'
             else if (j .eq. 2) then
-                args(j) = 'output.dat'
+                args(j) = 'output.h5'
             end if
         end if
     end do
