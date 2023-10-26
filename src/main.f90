@@ -87,16 +87,16 @@ program loess3d
     deallocate(x, y, z, O, LO)
 
 !!!! OUTPUT
-    call create_hdf5_file(args(2), file_id)
-    call write_integer(n, "n", file_id, status)
-    call write_integer(m, "m", file_id, status)
-    call write_integer(l, "l", file_id, status)
-    call write_real_3d_array(Xout, "Yq",      file_id, status)
-    call write_real_3d_array(Yout, "logtemp", file_id, status)
-    call write_real_3d_array(Zout, "lognb",   file_id, status)
-    call write_real_3d_array(Oin,  "f_in",    file_id, status)
-    call write_real_3d_array(Oout, "f_out",   file_id, status)
-    call close_hdf5_file(file_id)
+    call create_hdf5file(args(2), file_id, status)
+    call write_to_hdf5(n, "n", file_id, status)
+    call write_to_hdf5(m, "m", file_id, status)
+    call write_to_hdf5(l, "l", file_id, status)
+    call write_to_hdf5(Xout, "Yq",      file_id, status)
+    call write_to_hdf5(Yout, "logtemp", file_id, status)
+    call write_to_hdf5(Zout, "lognb",   file_id, status)
+    call write_to_hdf5(Oin, "f_in", file_id, status)
+    call write_to_hdf5(Oout, "f_out", file_id, status)
+    call close_hdf5file(file_id, status)
 !!! END OUTPUT
 
     deallocate(Oout, Wout, Xout, Yout, Zout, Oin)
