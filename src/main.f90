@@ -11,12 +11,11 @@ program loess3d
     implicit none (type, external)
 
     ! Physical parameters
-    real(RK) :: f, w
+    real(RK) :: f, w, frac
     real(RK), dimension(:), allocatable :: x, y, z, O, LO, LW
     real(RK), dimension(:,:,:), allocatable :: Oout, Wout, Oin, Xout, Yout, Zout
     integer  :: totL, npoints, n, l, m
     
-    real(RK), parameter :: frac = 0.1
     integer, parameter :: degree = 1
 
     ! Computational parameters
@@ -42,7 +41,7 @@ program loess3d
         end if
     end do
 
-    call readParams(args(1), totL, n, l, m, Nth)
+    call readParams(args(1), totL, n, l, m, Nth, frac)
     allocate(x(totL), y(totL), z(totL), O(totL), LO(totL), LW(totL))
     call readData(args(1), totL, x, y, z, O)
 

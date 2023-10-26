@@ -5,9 +5,10 @@ module ioFunc
     
 contains
 
-    subroutine readParams(fpath, totL, n, l, m, Nth)
+    subroutine readParams(fpath, totL, n, l, m, Nth, fr)
         character(4096), intent(in) :: fpath
         integer, intent(out) :: totL, n, l, m, Nth
+        real(RK), intent(out) :: fr
 
         integer :: nu, ios
 
@@ -17,7 +18,9 @@ contains
         ! Read Nth
         read(nu, *, iostat=ios) Nth
         if (ios /= 0) STOP "Error while reading Nth from data file."
-
+        ! Read frac
+        read(nu, *, iostat=ios) fr
+        if (ios /= 0) STOP "Error while reading Nth from data file."
         ! Read n, m, l
         read(nu, *, iostat=ios) n, m, l
         if (ios /= 0) STOP "Error while reading n,m,l from data file."
@@ -37,9 +40,11 @@ contains
         open(newunit=nu, file = fpath, status='old', iostat=ios)
         if ( ios /= 0 ) stop "Error opening data file."
 
-        ! Skip Nth, n, m, l
+        ! Skip Nth, frac, n, m, l
         read(nu, *, iostat=ios) nd
         if (ios /= 0) STOP "Error skipping reading Nth from data file."
+        read(nu, *, iostat=ios) nd
+        if (ios /= 0) STOP "Error skipping reading frac from data file."
         read(nu, *, iostat=ios) nd, md, ld
         if (ios /= 0) STOP "Error skipping reading n,m,l from data file."
 

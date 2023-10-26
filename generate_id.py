@@ -15,6 +15,7 @@ def reduce_points(l, s):
 
 
 Nth = sys.argv[1]
+frac = sys.argv[2]
 
 with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
 
