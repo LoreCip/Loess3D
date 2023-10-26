@@ -46,6 +46,7 @@ f_ran = entropy.copy()
 with open('data.init', 'w') as f:
 
     f.write(f"{Nth}\n")
+    f.write(f"{frac}\n")
     f.write(f"{n}\t{m}\t{l}\n")
     for arr in [X, Y, Z, f_ran]:    
         arr = arr.flatten()
