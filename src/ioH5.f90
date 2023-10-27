@@ -2,7 +2,7 @@ module ioH5
     
   use hdf5
   use iso_fortran_env, only: RK => real64, RKS => real32
-  use iso_c_binding, only:c_loc
+  use iso_c_binding, only: c_loc
 
   implicit none
 
@@ -101,15 +101,13 @@ contains
       ! check if gzip compression is available.
       call h5zfilter_avail_f(h5z_filter_deflate_f, avail, error)
       if (.not.avail) then
-        write(*,'("gzip filter not available.",/)')
-        return
+        stop "gzip filter not available"
       endif
     
       call h5zget_filter_info_f(h5z_filter_deflate_f, filter_info, error)
       filter_info_both=ior(h5z_filter_encode_enabled_f, h5z_filter_decode_enabled_f)
       if (filter_info /= filter_info_both) then
-        write(*,'("gzip filter not available for encoding and decoding.",/)')
-        return
+        stop "gzip filter not available for encoding and decoding"
       endif
     
       ! create file

@@ -71,7 +71,7 @@ program loess3d
     !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, i, j, k) NUM_THREADS(Nth)
     do ii = 1, totL
         k = mod(ii - 1, l) + 1
-        j = mod((ii - 1 - k + 1) / l, m) + 1
+        j = mod((ii - k) / l, m) + 1
         i = mod(( (ii-k)/l - (j-1)) / m , n) + 1
 
         Xout(i,j,k) = x(ii)
