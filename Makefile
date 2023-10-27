@@ -15,12 +15,12 @@ OBJECTS := $(patsubst   src/%.f90, $(OBJECTS_DIR)/%.o, $(F90_FILES))
 
 $(EXECUTABLE): $(OBJECTS)
 		@mkdir -p $(BIN_DIR)
-		$(FCOMP) -cpp  $(CCF) $(FFLAGS) $(FOMP) $(FOPT) -L/usr/local/lib/ $^ -o $@ -llapack -lblas 
+		$(FCOMP) -cpp  $(CCF) $(FFLAGS) $(FOMP) $(FOPT) $^ -o $@ -llapack -lblas 
 		@mv *.mod bin
 
 $(OBJECTS_DIR)/%.o : src/%.f90
 		@mkdir -p $(OBJECTS_DIR)
-		$(FCOMP) -cpp $(CCF) $(FC) $(FFLAGS) $(FOPT) $(FOMP) -L/usr/local/lib/ $< -o $@ -llapack -lblas 
+		$(FCOMP) -cpp $(CCF) $(FC) $(FFLAGS) $(FOPT) $(FOMP) $< -o $@ -llapack -lblas 
 		
 
 clean:
