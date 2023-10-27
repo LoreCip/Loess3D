@@ -35,6 +35,7 @@ contains
         integer, intent(in) :: totL
         real(RK), dimension(totL), intent(out) :: x, y, z, O
     
+        real(RK):: fd
         integer :: nu, ios, i, nd, md, ld
         
         open(newunit=nu, file = fpath, status='old', iostat=ios)
@@ -43,7 +44,7 @@ contains
         ! Skip Nth, frac, n, m, l
         read(nu, *, iostat=ios) nd
         if (ios /= 0) STOP "Error skipping reading Nth from data file."
-        read(nu, *, iostat=ios) nd
+        read(nu, *, iostat=ios) fd
         if (ios /= 0) STOP "Error skipping reading frac from data file."
         read(nu, *, iostat=ios) nd, md, ld
         if (ios /= 0) STOP "Error skipping reading n,m,l from data file."
