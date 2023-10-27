@@ -34,7 +34,7 @@ contains
         bad(:) = .false.
         do p = 1, 10
             aerr(:) = abs(Ofit(:) - O(inds))
-            call Median(npoints, aerr, mad)
+            mad = FindMedian(aerr, npoints)
             uu = ( aerr(:) / (6_RK*mad) )**2_RK
 
             uu(:) = max(0.0_RK, min(uu(:), 1.0_RK))
@@ -124,23 +124,45 @@ contains
 
     end subroutine comp_coeff
 
-    subroutine Median(npoints, arr, med)
-        
-        integer, intent(in)   :: npoints
-        real(RK), dimension(npoints), intent(in) :: arr
-        real(RK), intent(out) :: med
+    real(RK) recursive function Quickselect(arr, k) result(result)
+        real(RK), intent(in) :: arr(:)
+        integer, intent(in) :: k
+        real(RK), allocatable :: left(:), right(:), equal(:)
+        real(RK) :: pivot
 
-        integer, dimension(npoints) :: inds
-        integer :: n
-
-        call argsort(arr, inds)
-        n = npoints / 2        
-        if (mod(npoints,2) == 0) then           ! compute the median
-            med = (arr(inds(n)) + arr(inds(n+1))) / 2.0_RK
-        else
-            med = arr(inds(n+1))
+        if (size(arr) == 1) then
+        result = arr(1)
+        return
         end if
 
-    end subroutine Median  
+        pivot = arr(size(arr) / 2)
+        left = pack(arr, arr < pivot)
+        right = pack(arr, arr > pivot)
+        equal = pack(arr, arr == pivot)
+
+        if (k < size(left)) then
+        result = Quickselect(left, k)
+        elseif (k < size(left) + size(equal)) then
+        result = equal(1)
+        else
+        result = Quickselect(right, k - size(left) - size(equal))
+        end if
+    end function Quickselect
+
+    real(RK) function FindMedian(arr, n)
+        integer, intent(in) :: n
+        real(RK), intent(in) :: arr(n)
+        real(RK) :: left_median, right_median
+
+        if (mod(n,2) == 0) then
+            ! If the array has an even number of elements, the median is the average of the two middle elements.
+            left_median = Quickselect(arr, n / 2 - 1)
+            right_median = Quickselect(arr, n / 2)
+            FindMedian = (left_median + right_median) / 2.0
+        else
+            ! If the array has an odd number of elements, the median is the middle element.
+            FindMedian = Quickselect(arr, n / 2)
+        end if
+    end function FindMedian
 
 end module mathFunc
