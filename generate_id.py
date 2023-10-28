@@ -16,6 +16,7 @@ def reduce_points(l, s):
 
 Nth = sys.argv[1]
 frac = sys.argv[2]
+degree = sys.argv[3]
 
 with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
 
@@ -47,6 +48,7 @@ with open('data.init', 'w') as f:
 
     f.write(f"{Nth}\n")
     f.write(f"{frac}\n")
+    f.write(f"{degree}\n")
     f.write(f"{n}\t{m}\t{l}\n")
     for arr in [X, Y, Z, f_ran]:    
         arr = arr.flatten()

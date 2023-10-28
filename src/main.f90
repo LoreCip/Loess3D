@@ -16,11 +16,9 @@ program loess3d
     real(RK), dimension(:,:,:), allocatable :: Oout, Wout, Oin, Xout, Yout, Zout
     integer  :: totL, npoints, n, l, m
     
-    integer, parameter :: degree = 1
-
     ! Computational parameters
     integer(hid_t) :: file_id
-    integer  :: ii, i, j, k, d, Nth, status
+    integer  :: ii, i, j, k, d, Nth, status, degree
 
     integer :: num_args
     character(len=4096), dimension(2) :: args
@@ -41,7 +39,7 @@ program loess3d
         end if
     end do
 
-    call readParams(args(1), totL, n, l, m, Nth, frac)
+    call readParams(args(1), totL, n, l, m, Nth, frac, degree)
     allocate(x(totL), y(totL), z(totL), O(totL), LO(totL), LW(totL))
     call readData(args(1), totL, x, y, z, O)
 
