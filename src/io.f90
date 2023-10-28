@@ -21,6 +21,7 @@ contains
         ! Read frac
         read(nu, *, iostat=ios) fr
         if (ios /= 0) STOP "Error while reading Nth from data file."
+        ! Read degree
         read(nu, *, iostat=ios) degree
         if (ios /= 0) STOP "Error skipping reading degree from data file."
         ! Read n, m, l

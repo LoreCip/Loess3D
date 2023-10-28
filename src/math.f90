@@ -17,7 +17,6 @@ contains
         real(RK) :: xj, yj, zj, mad
         logical, dimension(npoints) :: bad, bad_old
         integer, dimension(npoints) :: inds
-        integer, dimension(totL)    :: Tinds
         integer  :: p
 
         xj = x(j)
@@ -25,8 +24,7 @@ contains
         zj = z(j)
 
         dist = sqrt( (x(:) - xj)**2_RK + (y(:) - yj)**2_RK + (z(:) - zj)**2_RK )
-        call argsort(dist, Tinds)
-        inds = Tinds(:npoints)
+        call pargsort(dist, inds, npoints)
         dist_weights = (1_RK - (dist(inds) / dist(inds(npoints)))**3_RK )**3_RK
 
         call comp_Ofit(npoints, x(inds), y(inds), z(inds), O(inds), d, dist_weights, Ofit)
