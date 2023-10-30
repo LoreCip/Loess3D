@@ -2,8 +2,13 @@ module mathFunc
     use sort_interface
     use omp_lib
     use iso_fortran_env, only: RK => real64
+
     implicit none (type, external)
     
+    public :: compute_loess
+    private :: comp_coeff, comp_Ofit, comp_a, \
+               Quickselect, FindMedian
+
 contains
 
     subroutine compute_loess(j, totL, npoints, d, x, y, z, O, fit, w)

@@ -6,18 +6,28 @@ import h5py as h5
 import numpy as np
 import plotly.graph_objects as go
 
-with h5.File("./logentropy/output.h5", 'r') as f:
+with h5.File("./output.h5", 'r') as f:
 
     n = f['n'][()]
     m = f['m'][()]
     l = f['l'][()]
 
-    X = f['Yq'][()].T
-    Y = f['logtemp'][()].T
-    Z = f['lognb'][()].T
+    ye = f['Yq'][()]
+    logtmp = f['logtemp'][()]
+    lognb = f['lognb'][()]
 
-    f_in = f['f_in'][()].T
-    f_out = f['f_out'][()].T
+    f_in = f['LogEntropy'][()].T
+    f_out = f['S_LogEntropy'][()].T
+
+X = np.zeros((n,m,l))
+Y = np.zeros((n,m,l))
+Z = np.zeros((n,m,l))
+for i in range(n):
+    X[i,:,:] = ye[i]
+for j in range(m):
+    Y[:,j,:] = logtmp[j]
+for k in range(l):
+    Z[:,:,k] = lognb[k]
 
 layout = go.Layout(width = 700, height =700)
 

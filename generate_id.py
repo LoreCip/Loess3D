@@ -13,18 +13,17 @@ def reduce_points(l, s):
 
     return points, l
 
+Nth = int(sys.argv[1])
+frac = float(sys.argv[2])
+degree = int(sys.argv[3])
 
-Nth = sys.argv[1]
-frac = sys.argv[2]
-degree = sys.argv[3]
-
-with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(SFHoY).h5', 'r') as f:
+with h5.File('./EOS/FOP(SFHoY).h5', 'r') as f:
 
     n, m, l = int(f['pointsye'][()]), int(f['pointstemp'][()]), int(f['pointsrho'][()])
 
-    points_n, n = reduce_points(n, 1)
-    points_m, m = reduce_points(m, 1)
-    points_l, l = reduce_points(l, 2)
+    points_n, n = reduce_points(n, 6)
+    points_m, m = reduce_points(m, 6)
+    points_l, l = reduce_points(l, 20)
 
     logtmp = f['logtemp'][()][points_m]
     lognb  = np.log10(f['nb'][()][points_l])
@@ -32,27 +31,20 @@ with h5.File('/home/lorenzo/phd/DePietri/NS_HOT_EOS/EOS/compOSE/FOP(SFHoY)/FOP(S
     entropy= np.log10(f['entropy'][()])
     entropy = entropy[np.ix_(points_n, points_m, points_l)]
 
-X = np.zeros((n,m,l))
-Y = np.zeros((n,m,l))
-Z = np.zeros((n,m,l))
-for i in range(n):
-    X[i,:,:] = ye[i]
-for j in range(m):
-    Y[:,j,:] = logtmp[j]
-for k in range(l):
-    Z[:,:,k] = lognb[k]
-
 f_ran = entropy.copy()
 
-with open('data.init', 'w') as f:
+with h5.File('./logentropy/completeData.h5', 'w') as f:
 
-    f.write(f"{Nth}\n")
-    f.write(f"{frac}\n")
-    f.write(f"{degree}\n")
-    f.write(f"{n}\t{m}\t{l}\n")
-    for arr in [X, Y, Z, f_ran]:    
-        arr = arr.flatten()
-        for i in range(len(arr)):
-            f.write(str(arr[i]) + "\t")
+    # Scalars
+    f['n'] = n
+    f['m'] = m
+    f['l'] = l
+    f['Nth'] = Nth
+    f['degree'] = degree
+    f['frac']   = frac
 
-        f.write("\n")
+    # Arrays 1D
+    f.create_dataset('Yq', data=ye, compression='gzip', compression_opts=9)
+    f.create_dataset('logtemp', data=logtmp, compression='gzip', compression_opts=9)
+    f.create_dataset('lognb', data=lognb, compression='gzip', compression_opts=9)
+    f.create_dataset('LogEntropy', data=f_ran, compression='gzip')    

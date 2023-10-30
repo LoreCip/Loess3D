@@ -4,7 +4,8 @@ program loess3d
     
     use OMP_LIB
 
-    use ioFunc
+    use TimerModule
+    use utils
     use ioH5
     use mathFunc
     
@@ -12,19 +13,18 @@ program loess3d
 
     ! Physical parameters
     real(RK) :: f, w, frac
-    real(RK), dimension(:), allocatable :: x, y, z, O, LO, LW
-    real(RK), dimension(:,:,:), allocatable :: Oout, Wout, Oin, Xout, Yout, Zout
+    real(RK), dimension(:), allocatable :: xtmp, ytmp, ztmp, x, y, z, O, LO, LW
+    real(RK), dimension(:,:,:), allocatable :: Oout, Wout, Xin, Yin, Zin, Oin
     integer  :: totL, npoints, n, l, m
     
     ! Computational parameters
+    type(TimerClass) :: timer
+    logical :: got
     integer(hid_t) :: file_id
-    integer  :: ii, i, j, k, d, Nth, status, degree
+    integer  :: ii, j, d, Nth, status, degree
 
     integer :: num_args
     character(len=4096), dimension(2) :: args
-
-    real(RK) :: systemtime
-    integer  :: iTimes1, iTimes2, rate
 
     num_args = command_argument_count()
     if (num_args .gt. 2) STOP "Only two args are contemplated, the path of the data file and the path for the output!"
@@ -39,17 +39,52 @@ program loess3d
         end if
     end do
 
-    call readParams(args(1), totL, n, l, m, Nth, frac, degree)
+    call open_hdf5file(args(1), file_id, status)
+    
+    call read_from_hdf5(n, 'n', file_id, got, status)
+    call read_from_hdf5(m, 'm', file_id, got, status)
+    call read_from_hdf5(l, 'l', file_id, got, status)
+    call read_from_hdf5(Nth, 'Nth', file_id, got, status)
+    call read_from_hdf5(degree, 'degree', file_id, got, status)
+    call read_from_hdf5(frac, 'frac', file_id, got, status)
+    
+    totL = n*m*l
+    allocate(xtmp(n), ytmp(m), ztmp(l), Oin(n,m,l))
+             
+    call read_from_hdf5(xtmp, 'Yq', file_id, got, status)
+    call read_from_hdf5(ytmp, 'logtemp', file_id, got, status)
+    call read_from_hdf5(ztmp, 'lognb', file_id, got, status)
+    call read_from_hdf5(Oin, 'LogEntropy', file_id, got, status)
+    call close_hdf5file(file_id, status)
+
+    allocate(Xin(n,m,l), Yin(n,m,l), Zin(n,m,l))
+    
+    do ii = 1, n
+        Xin(ii, :, :) = xtmp(ii)
+    end do
+    do ii = 1, m
+        Yin(:, ii, :) = ytmp(ii)
+    end do
+    do ii = 1, l
+        Zin(:, :, ii) = ztmp(ii)
+    end do
+
+    deallocate(xtmp, ytmp, ztmp)
     allocate(x(totL), y(totL), z(totL), O(totL), LO(totL), LW(totL))
-    call readData(args(1), totL, x, y, z, O)
+
+    call Cflatten(Xin, x)
+    call Cflatten(Yin, y)
+    call Cflatten(Zin, z)
+    call Cflatten(Oin, O)
+
+    deallocate(Xin, Yin, Zin, Oin)
 
     npoints = int(ceiling(frac*totL))
     d = 2*(degree**2 + 1)
 
-    CALL system_clock(count_rate=rate)
-    call SYSTEM_CLOCK(iTimes1)
+    call timer%start()
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(j, f, w) NUM_THREADS(Nth)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth)
     do ii = 1, totL
 
         call compute_loess(ii, totL, npoints, d, x, y, z, O, f, w)
@@ -59,44 +94,27 @@ program loess3d
     end do
     !$OMP END PARALLEL DO
 
-    call SYSTEM_CLOCK(iTimes2)
-    systemtime = real(iTimes2-iTimes1)/real(rate)
-    write(*, *) "Total system runtime:", systemtime, " seconds."
-    write(*, *) "System runtime for iteration:", systemtime/totL, " seconds."
+    call timer%stop()    
+    call timer%printTime()
     
-    allocate(Oout(n,m,l), Wout(n,m,l), Oin(n,m,l), Xout(n,m,l), Yout(n,m,l), Zout(n,m,l))
+    allocate(Oout(n,m,l), Wout(n,m,l))
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, i, j, k) NUM_THREADS(Nth)
-    do ii = 1, totL
-        k = mod(ii - 1, l) + 1
-        j = mod((ii - k) / l, m) + 1
-        i = mod(( (ii-k)/l - (j-1)) / m , n) + 1
-
-        Xout(i,j,k) = x(ii)
-        Yout(i,j,k) = y(ii)
-        Zout(i,j,k) = z(ii)
-        Oin(i,j,k)  = O(ii)
-        Oout(i,j,k) = LO(ii)
-        Wout(i,j,k) = LW(ii)
-    end do
-    !$OMP END PARALLEL DO
+    call Cpack_3d(LO, Oout, n, m, l, Nth)
+    call Cpack_3d(LW, Wout, n, m, l, Nth)
 
     deallocate(x, y, z, O, LO)
 
 !!!! OUTPUT
-    call create_hdf5file(args(2), file_id, status)
-    call write_to_hdf5(n, "n", file_id, status)
-    call write_to_hdf5(m, "m", file_id, status)
-    call write_to_hdf5(l, "l", file_id, status)
-    call write_to_hdf5(Xout, "Yq",      file_id, status)
-    call write_to_hdf5(Yout, "logtemp", file_id, status)
-    call write_to_hdf5(Zout, "lognb",   file_id, status)
-    call write_to_hdf5(Oin, "f_in", file_id, status)
-    call write_to_hdf5(Oout, "f_out", file_id, status)
+
+    call open_hdf5file(args(1), file_id, status)
+    call write_to_hdf5(Oout, "S_LogEntropy", file_id, status)
+    call write_to_hdf5(Wout, "W_LogEntropy", file_id, status)
     call close_hdf5file(file_id, status)
+
 !!! END OUTPUT
 
-    deallocate(Oout, Wout, Xout, Yout, Zout, Oin)
+    deallocate(Oout, Wout)
 
     stop
 end program loess3d
+

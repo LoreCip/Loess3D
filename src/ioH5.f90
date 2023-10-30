@@ -471,6 +471,7 @@ contains
       integer(hid_t)     :: dset_id
       integer(hid_t)     :: prop_id
       integer(hid_t)     :: dtype_id
+
       xshape = shape(x)
       chunk = shape(x)
       dtype_id = h5t_native_double
@@ -492,7 +493,7 @@ contains
       ! write to file
       call h5dwrite_f(dset_id, dtype_id, x, xshape, error)
       call check(error, "Cannot write to hdf5 file")
-
+      
       ! close property list
       call h5pclose_f(prop_id, error)
       call check(error, "Cannot close hdf5 property list")
