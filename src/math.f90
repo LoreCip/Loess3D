@@ -144,11 +144,11 @@ contains
         equal = pack(arr, arr == pivot)
 
         if (k < size(left)) then
-        result = Quickselect(left, k)
+            result = Quickselect(left, k)
         elseif (k < size(left) + size(equal)) then
-        result = equal(1)
+            result = equal(1)
         else
-        result = Quickselect(right, k - size(left) - size(equal))
+            result = Quickselect(right, k - size(left) - size(equal))
         end if
     end function Quickselect
 

@@ -24,20 +24,14 @@ program loess3d
     integer  :: ii, j, d, Nth, status, degree
 
     integer :: num_args
-    character(len=4096), dimension(2) :: args
+    character(len=4096), dimension(1) :: args
 
     num_args = command_argument_count()
-    if (num_args .gt. 2) STOP "Only two args are contemplated, the path of the data file and the path for the output!"
-    do j = 1, 2
-        call get_command_argument(j,args(j))
-        if (args(j) .eq. '') then
-            if (j.eq.1) then
-                args(j) = 'data.dat'
-            else if (j .eq. 2) then
-                args(j) = 'output.h5'
-            end if
-        end if
-    end do
+    if (num_args .gt. 2) STOP "Only one arg is expected, the path of the data file."
+    call get_command_argument(j,args(j))
+    if (args(1) .eq. '') then
+        args(1) = 'data.h5'
+    end if
 
     call open_hdf5file(args(1), file_id, status)
     

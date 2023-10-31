@@ -16,7 +16,7 @@ OBJECTS := $(patsubst   src/%.f90, $(OBJECTS_DIR)/%.o, $(F90_FILES))
 $(EXECUTABLE): $(OBJECTS)
 		@mkdir -p $(BIN_DIR)
 		$(FCOMP) -cpp  $(CCF) $(FFLAGS) $(FOMP) $(FOPT) $^ -o $@ -llapack -lblas 
-		@mv *.mod bin
+		@mv *.mod $(OBJECTS_DIR)
 
 $(OBJECTS_DIR)/%.o : src/%.f90
 		@mkdir -p $(OBJECTS_DIR)
