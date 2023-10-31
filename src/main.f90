@@ -21,14 +21,14 @@ program loess3d
     type(TimerClass) :: timer
     logical :: got
     integer(hid_t) :: file_id
-    integer  :: ii, j, d, Nth, status, degree
+    integer  :: ii, d, Nth, status, degree
 
     integer :: num_args
     character(len=4096), dimension(1) :: args
 
     num_args = command_argument_count()
     if (num_args .gt. 2) STOP "Only one arg is expected, the path of the data file."
-    call get_command_argument(j,args(j))
+    call get_command_argument(1,args(1))
     if (args(1) .eq. '') then
         args(1) = 'data.h5'
     end if
