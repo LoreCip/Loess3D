@@ -79,7 +79,7 @@ program loess3d
     call timer%initialize()
     call timer%start()
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth) SCHEDULE(GUIDED)
     do ii = 1, totL
 
         call compute_loess(ii, totL, npoints, d, x, y, z, O, f, w)
