@@ -4,8 +4,8 @@ program loess3d
     
     use OMP_LIB
 
-    use TimerModule
     use utils
+    use TimerModule
     use ioH5
     use mathFunc
     
