@@ -79,9 +79,10 @@ program loess3d
 
     deallocate(Xin, Yin, Zin, Oin)
 
-    npoints = int(ceiling(frac*totL))
+    npoints = int(ceiling(frac*real(totL)))
     d = 2*(degree**2 + 1)
 
+    call timer%initialize()
     call timer%start()
 
     !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth)

@@ -48,6 +48,7 @@ contains
     
 end module utils
 
+
 module TimerModule
     use iso_fortran_env, only: RK => real64
     implicit none
@@ -57,32 +58,52 @@ module TimerModule
       integer :: rate
       integer :: startTime
       real(RK) :: system_time
+      logical :: alreadyStarted
     contains
-      procedure :: start
-      procedure :: stop
-      procedure :: printTime
+      procedure :: start, stop
+      procedure :: printTime, initialize
     end type TimerClass
   
+    
 contains
   
+    subroutine initialize(this)
+        class(TimerClass), intent(inout) :: this
+        this%alreadyStarted = .false.
+        call system_clock(count_rate=this%rate)
+    end subroutine initialize
+
     subroutine start(this)
       class(TimerClass), intent(inout) :: this
-      call system_clock(count_rate=this%rate)
+    
+      if (this%alreadyStarted.eqv..true.) then
+        write(*, '(A)') 'Timer already started.'
+        return
+      end if
+
+      this%alreadyStarted = .true.
       call system_clock(this%startTime)
     end subroutine start
   
     subroutine stop(this)
       class(TimerClass), intent(inout) :: this  
       integer :: endTime
-  
+
       call system_clock(endTime)
+
+      if (this%alreadyStarted.eqv..false.) then
+        write(*, '(A)') 'Timer not started.'
+        return
+      end if
+
       this%system_time = real(endTime - this%startTime) / real(this%rate)
+      this%alreadyStarted = .false.
 
     end subroutine stop
 
     subroutine printTime(this)
         class(TimerClass), intent(inout) :: this  
-        write(*, *) "Total system runtime:", this%system_time, " seconds."
+        write(*, '(A, F0.2, A)') "Total system runtime: ", this%system_time, " seconds."
     end subroutine printTime
   
 end module TimerModule
