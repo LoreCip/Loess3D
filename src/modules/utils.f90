@@ -27,22 +27,22 @@ contains
 
     end subroutine Cflatten
 
-    subroutine Cpack_3d(xi, xo, d1, d2, d3, Nth)
+    subroutine Cpack_3d(xi, xo, d1, d2, d3)
         real(RK), intent(in) :: xi(:)
         real(RK), intent(inout) :: xo(:, :, :)
-        integer, intent(in) :: d1, d2, d3, Nth
+        integer, intent(in) :: d1, d2, d3
 
         integer :: ii, i, j, k
 
-        !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, i, j, k) NUM_THREADS(Nth)
+        !$OMP PARALLEL DO SIMD DEFAULT(SHARED) PRIVATE(ii, i,j,k) NUM_THREADS(4)
         do ii = 1, size(xi)
             k = mod(ii - 1, d3) + 1
             j = mod((ii - k) / d3, d2) + 1
-            i = mod(( (ii-k)/d3 - (j-1)) / d2 , d1) + 1
+            i = mod(( (ii-k)/d3 - (j-1) ) / d2 , d1) + 1
 
             xo(i,j,k) = xi(ii)
         end do
-        !$OMP END PARALLEL DO
+        !$OMP END PARALLEL DO SIMD
 
     end subroutine Cpack_3d
     
@@ -61,17 +61,17 @@ module TimerModule
       logical :: alreadyStarted
     contains
       procedure :: start, stop
-      procedure :: printTime, initialize
+      procedure :: printTime, initializeTimer
     end type TimerClass
   
     
 contains
   
-    subroutine initialize(this)
+    subroutine initializeTimer(this)
         class(TimerClass), intent(inout) :: this
         this%alreadyStarted = .false.
         call system_clock(count_rate=this%rate)
-    end subroutine initialize
+    end subroutine initializeTimer
 
     subroutine start(this)
       class(TimerClass), intent(inout) :: this

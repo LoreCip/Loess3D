@@ -27,13 +27,13 @@ program loess3d
     character(len=4096), dimension(1) :: args
 
     num_args = command_argument_count()
-    if (num_args .gt. 2) STOP "Only one arg is expected, the path of the data file."
+    if (num_args .gt. 1) STOP "Only one arg is expected, the path of the data file."
     call get_command_argument(1,args(1))
     if (args(1) .eq. '') then
         args(1) = 'data.h5'
     end if
 
-    call open_hdf5file(args(1), file_id, status)
+    call open_hdf5file(trim(args(1)), file_id, status)
     
     call read_from_hdf5(n, 'n', file_id, got, status)
     call read_from_hdf5(m, 'm', file_id, got, status)
@@ -76,16 +76,16 @@ program loess3d
     npoints = int(ceiling(frac*real(totL)))
     d = 2*(degree**2 + 1)
 
-    call timer%initialize()
+    call timer%initializeTimer()
     call timer%start()
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth) SCHEDULE(GUIDED)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth)
     do ii = 1, totL
 
         call compute_loess(ii, totL, npoints, d, x, y, z, O, f, w)
         LO(ii) = f
         LW(ii) = w
-
+        
     end do
     !$OMP END PARALLEL DO
 
@@ -94,14 +94,14 @@ program loess3d
     
     allocate(Oout(n,m,l), Wout(n,m,l))
 
-    call Cpack_3d(LO, Oout, n, m, l, Nth)
-    call Cpack_3d(LW, Wout, n, m, l, Nth)
+    call Cpack_3d(LO, Oout, n, m, l)
+    call Cpack_3d(LW, Wout, n, m, l)
 
-    deallocate(x, y, z, O, LO)
+    deallocate(x, y, z, O, LO, LW)
 
 !!!! OUTPUT
 
-    call open_hdf5file(args(1), file_id, status)
+    call open_hdf5file(trim(args(1)), file_id, status)
     call write_to_hdf5(Oout, "S_LogEntropy", file_id, status)
     call write_to_hdf5(Wout, "W_LogEntropy", file_id, status)
     call close_hdf5file(file_id, status)

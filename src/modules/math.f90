@@ -134,8 +134,8 @@ contains
         real(RK) :: pivot
 
         if (size(arr) == 1) then
-        result = arr(1)
-        return
+            result = arr(1)
+            return
         end if
 
         pivot = arr(size(arr) / 2)

@@ -6,7 +6,7 @@ import h5py as h5
 import numpy as np
 import plotly.graph_objects as go
 
-with h5.File("./output.h5", 'r') as f:
+with h5.File("./completeData.h5", 'r') as f:
 
     n = f['n'][()]
     m = f['m'][()]
@@ -17,7 +17,7 @@ with h5.File("./output.h5", 'r') as f:
     lognb = f['lognb'][()]
 
     f_in = f['LogEntropy'][()].T
-    f_out = f['S_LogEntropy'][()].T
+    f_out3D = f['S_LogEntropy'][()].T
 
 X = np.zeros((n,m,l))
 Y = np.zeros((n,m,l))
@@ -31,7 +31,7 @@ for k in range(l):
 
 layout = go.Layout(width = 700, height =700)
 
-fig = go.Figure(data=[go.Surface(x = Y[0,:,:], y = Z[0,:,:], z=f_out[0,:,:], colorscale = 'Blues')], layout=layout)
+fig = go.Figure(data=[go.Surface(x = Y[0,:,:], y = Z[0,:,:], z=f_out3D[0,:,:], colorscale = 'Blues')], layout=layout)
  
 fig.add_scatter3d(x=Y[0,:,:].flatten(), y=Z[0,:,:].flatten(), z = f_in[0,:,:].flatten(), mode='markers', marker=dict(size=5, colorscale='Reds'))
  
