@@ -100,7 +100,7 @@ program loess3d
         npoints = int(ceiling(frac*real(totL)))
         d = 2*(degree**2 + 1)
 
-        call timer%initialize()
+        call timer%initializeTimer()
         call timer%start()
     end if
 
@@ -156,8 +156,8 @@ program loess3d
     
         allocate(Oout(n,m,l), Wout(n,m,l))
 
-        call Cpack_3d(LO, Oout, n, m, l, Nth)
-        call Cpack_3d(LW, Wout, n, m, l, Nth)
+        call Cpack_3d(LO, Oout, n, m, l)
+        call Cpack_3d(LW, Wout, n, m, l)
 
         deallocate(x, y, z, O, LO, LW)
 
