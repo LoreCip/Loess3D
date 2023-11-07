@@ -33,7 +33,7 @@ program loess3d
     integer :: provided, mpi_len, mpi_rank, mpi_size
 
     integer :: num_args
-    character(len=4096), dimension(1) :: args
+    character(len=4096), dimension(2) :: args
 
     !! MPI STARTS
 
@@ -48,13 +48,16 @@ program loess3d
 
     if (mpi_rank.eq.0) then
         num_args = command_argument_count()
-        if (num_args .gt. 1) STOP "Only one arg is expected, the path of the data file."
-        call get_command_argument(1,args(1))
+        if (num_args .gt. 2) STOP "Only two args are expected, the path of the data file and the name of the variable to smooth."
+        do ii = 1, 2
+            call get_command_argument(ii,args(ii))
+        end do
+        if (args(2).eq.'') stop "Specify one variable to smooth!"
         if (args(1) .eq. '') then
             args(1) = 'data.h5'
         end if
 
-        call open_hdf5file(args(1), file_id, status)
+        call open_hdf5file(trim(args(1)), file_id, status)
 
         call read_from_hdf5(n, 'n', file_id, got, status)
         call read_from_hdf5(m, 'm', file_id, got, status)
@@ -69,7 +72,7 @@ program loess3d
         call read_from_hdf5(x, 'Yq', file_id, got, status)
         call read_from_hdf5(y, 'logtemp', file_id, got, status)
         call read_from_hdf5(z, 'lognb', file_id, got, status)
-        call read_from_hdf5(Oin, 'LogEntropy', file_id, got, status)
+        call read_from_hdf5(Oin, trim(args(2)), file_id, got, status)
         call close_hdf5file(file_id, status)
 
         allocate(Xin(n,m,l), Yin(n,m,l), Zin(n,m,l))
@@ -159,7 +162,7 @@ program loess3d
         deallocate(x, y, z, O, LO, LW)
 
         !!! OUTPUT
-        call open_hdf5file(args(1), file_id, status)
+        call open_hdf5file(trim(args(1)), file_id, status)
         call write_to_hdf5(Oout, "S_LogEntropy", file_id, status)
         call write_to_hdf5(Wout, "W_LogEntropy", file_id, status)
         call close_hdf5file(file_id, status)
