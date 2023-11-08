@@ -155,8 +155,7 @@ program loess3d
 
         !!! OUTPUT
         call open_hdf5file(trim(args(1)), file_id, status)
-        call write_to_hdf5(Oout, "S_LogEntropy", file_id, status)
-        call write_to_hdf5(Wout, "W_LogEntropy", file_id, status)
+        call write_to_hdf5(Oout, trim(args(2)(3:)), file_id, status)
         call close_hdf5file(file_id, status)
         !!! END OUTPUT
 

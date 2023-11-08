@@ -11,7 +11,7 @@ BIN_DIR = bin
 EXECUTABLE = $(BIN_DIR)/run
 
 F90_FILES := src/modules/ioH5.f90 src/modules/sort_interface.f90 src/modules/utils.f90 src/modules/math.f90 src/main.f90
-FCOMP = h5fc
+FCOMP ?= h5fc
 
 OBJECTS := $(patsubst src/modules/%.f90, $(OBJECTS_DIR)/%.o, $(F90_FILES))
 

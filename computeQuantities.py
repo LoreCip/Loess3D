@@ -56,7 +56,6 @@ with h5.Open(fname, 'r') as f:
 
     LogEntropy = f['LogEntropy'][()]
     LogPressure= f['LogPressure'][()]
-    
 
 if qty == 'betaV':
     out = compBetaV(lognb, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
@@ -64,7 +63,6 @@ if qty == 'kappaT':
     out = compKappaT(lognb, 10**LogPressure, len(ye), len(logtmp), len(lognb))
 if qty == 'cV':
     out == compCV(logtemp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
-
     
 with h5.Open(fname, 'w') as f:
-    f.create_dataset(qty, data=out.T, compression='gzip', compression_opts=9)    
+    f.create_dataset('O_' + qty, data=out.T, compression='gzip', compression_opts=9)    
