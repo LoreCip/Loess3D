@@ -3,9 +3,27 @@ module utils
     use iso_fortran_env, only: RK => real64
     implicit none
 
-    public :: Cflatten, Cpack_3d
+    public :: Cflatten, Cpack_3d, checkInputArgs
 
 contains
+
+    subroutine checkInputArgs(args)
+
+        character(len=*), dimension(2), intent(out) :: args
+        integer :: num_args, ii
+
+
+        num_args = command_argument_count()
+        if (num_args.ne.size(args)) then
+            write(*,'(A, I1, A)') "I expect ", size(args), " input arguments: the H5 file with the data and the name of the variable to smooth."
+            STOP
+        end if
+
+        do ii = 1, num_args
+            call get_command_argument(ii,args(ii))
+        end do
+        
+    end subroutine checkInputArgs
 
     subroutine Cflatten(xi, xo)
 

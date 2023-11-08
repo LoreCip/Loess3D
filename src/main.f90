@@ -32,7 +32,6 @@ program loess3d
     real(RK), dimension(:), allocatable :: mpi_LO, mpi_LW
     integer :: provided, mpi_len, mpi_rank, mpi_size
 
-    integer :: num_args
     character(len=4096), dimension(2) :: args
 
     !! MPI STARTS
@@ -47,15 +46,8 @@ program loess3d
 #endif
 
     if (mpi_rank.eq.0) then
-        num_args = command_argument_count()
-        if (num_args .gt. 2) STOP "Only two args are expected, the path of the data file and the name of the variable to smooth."
-        do ii = 1, 2
-            call get_command_argument(ii,args(ii))
-        end do
-        if (args(2).eq.'') stop "Specify one variable to smooth!"
-        if (args(1) .eq. '') then
-            args(1) = 'data.h5'
-        end if
+
+        call checkInputArgs(args)
 
         call open_hdf5file(trim(args(1)), file_id, status)
 
