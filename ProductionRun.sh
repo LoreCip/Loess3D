@@ -56,16 +56,16 @@ $PYTHON $runpath/$name/Code/PScripts/computeQuantities.py $runpath/$name/data.h5
 $PYTHON $runpath/$name/Code/PScripts/computeQuantities.py $runpath/$name/data.h5 cV
 
 # betaV
-echo "Smoothing betaV" >> $tracker
+echo "Smoothing betaV..." >> $tracker
 date >> $tracker
 mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_betaV
 
 # kappaT
-echo "Smoothing kappaT" >> $tracker
+echo "Smoothing kappaT..." >> $tracker
 date >> $tracker
 mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_kappaT
 
 # cV
-echo "Smoothing cV" >> $tracker
+echo "Smoothing cV..." >> $tracker
 date >> $tracker
 mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_cV
