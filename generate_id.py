@@ -26,9 +26,9 @@ with h5.File(EOSpath, 'r') as f:
 
     n, m, l = int(f['pointsye'][()]), int(f['pointstemp'][()]), int(f['pointsrho'][()])
 
-    points_n, n = reduce_points(n, 1)
-    points_m, m = reduce_points(m, 1)
-    points_l, l = reduce_points(l, 1)
+    points_n, n = reduce_points(n, 4)
+    points_m, m = reduce_points(m, 4)
+    points_l, l = reduce_points(l, 20)
 
     logtmp = f['logtemp'][()][points_m]
     lognb  = np.log10(f['nb'][()][points_l])

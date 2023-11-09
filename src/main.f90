@@ -40,6 +40,7 @@ program loess3d
     call mpi_init_thread(MPI_THREAD_FUNNELED, provided, status)
     call mpi_comm_size(MPI_COMM_WORLD, mpi_size, status)
     call mpi_comm_rank(MPI_COMM_WORLD, mpi_rank, status)
+    if (mpi_rank.eq.0) write(*,'(A, I2, A)') "Using MPI with ", mpi_size, " processes."
 #else
     mpi_rank = 0
     mpi_size = 1
@@ -118,8 +119,12 @@ program loess3d
 #ifdef USE_MPI
     allocate(mpi_LO(mpi_len), mpi_LW(mpi_len))
 #endif
+#ifdef _OPENMP
+    call omp_set_num_threads(Nth)
+    if (mpi_rank.eq.0) write(*, '(A, I2, A)') "Using OMP with ", Nth, " threads per process."
+#endif
 
-    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w) NUM_THREADS(Nth)
+    !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ii, f, w)
     do ii = 1, mpi_len
 
         call compute_loess(mpi_rank*mpi_len + ii, totL, npoints, d, x, y, z, O, f, w)
