@@ -21,7 +21,7 @@ def compBetaV(lognb, entropy, pointsyq, pointstemp, pointsrho):
             out[k, i, -1] = -10**lognb[-1] * (entropy[k,i,-1]-entropy[k,i,-2]) / (lognb[-1]-lognb[-2])
             
     return out
-
+@njit
 def compKappaT(lognb, pressure, pointsyq, pointstemp, pointsrho):
     out = np.zeros((pointsyq, pointstemp, pointsrho))
     for k in range(pointsyq):
@@ -33,7 +33,7 @@ def compKappaT(lognb, pressure, pointsyq, pointstemp, pointsrho):
             out[k, i, -1] = (pressure[k,i,-1]-pressure[k,i,-2]) / (lognb[-1]-lognb[-2])
 
     return np.where(kappa_T != 0, 1 / kappa_T, 0)
-
+@njit
 def compCV(logtemp, entropy, pointsyq, pointstemp, pointsrho):
     out = np.zeros((pointsyq, pointstemp, pointsrho))
     for k in range(pointsyq):

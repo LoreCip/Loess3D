@@ -75,7 +75,7 @@ module TimerModule
       private
       integer :: rate
       integer :: startTime
-      real(RK) :: system_time
+      real(RK) :: system_time, secondsPerHour, secondsPerMinute
       logical :: alreadyStarted
     contains
       procedure :: start, stop
@@ -87,6 +87,8 @@ contains
   
     subroutine initializeTimer(this)
         class(TimerClass), intent(inout) :: this
+        this%secondsPerHour = 3600
+        this%secondsPerMinute = 60
         this%alreadyStarted = .false.
         call system_clock(count_rate=this%rate)
     end subroutine initializeTimer
@@ -120,8 +122,13 @@ contains
     end subroutine stop
 
     subroutine printTime(this)
-        class(TimerClass), intent(inout) :: this  
-        write(*, '(A, F0.2, A)') "Total system runtime: ", this%system_time, " seconds."
+        class(TimerClass), intent(inout) :: this
+        integer :: hours, minutes, seconds
+
+        hours = int(this%system_time / this%secondsPerHour)
+        minutes = int(mod(this%system_time, this%secondsPerHour) / this%secondsPerMinute)
+        seconds = int(mod(this%system_time, this%secondsPerMinute))
+        write(*, '(A, I3, A, I2, A, I2)') "Total system runtime ", hours, ':', minutes, ':', seconds
     end subroutine printTime
   
 end module TimerModule
