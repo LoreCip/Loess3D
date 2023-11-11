@@ -128,7 +128,7 @@ contains
         hours = int(this%system_time / this%secondsPerHour)
         minutes = int(mod(this%system_time, this%secondsPerHour) / this%secondsPerMinute)
         seconds = int(mod(this%system_time, this%secondsPerMinute))
-        write(*, '(A, I3, A, I2, A, I2)') "Total system runtime ", hours, ':', minutes, ':', seconds
+        write(*, '(A, I0.3, A, I0.2, A, I0.2)') "Total system runtime ", hours, ':', minutes, ':', seconds
     end subroutine printTime
   
 end module TimerModule
