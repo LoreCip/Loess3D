@@ -3,7 +3,20 @@
 mkdir $runpath/$name
 tracker="$runpath/$name/tracker.out"
 
-# Python
+# Script to compute the derived quantities
+PY_SRC=$runpath/$name/Code/PScripts
+
+# Launcher
+LAUNCHER=$runpath/$name/Code/bin/run
+if [ "${USE_MPI}"=true ]
+then
+    LAUNCHER="mpiexec -n $nexec $LAUNCHER"
+fi
+
+# Path of ID file
+FILE=$runpath/$name/data.h5
+
+# Which python to use
 PYTHON=$runpath/venv/bin/python3
 
 # Path of EOS file
@@ -28,44 +41,42 @@ echo "Starting: $dd" >> $tracker
 cp -r $runpath/Code $runpath/$name
 cd $runpath/$name/Code
 OC=/nfs/scratch/lorecip/.localHDF5_1.14.1/bin/h5fc
-make FCOMP=$OC
+if [ "${USE_MPI}"=true ]
+then
+    make FCOMP=$OC
+else
+    make FCOMP=$OC USEMPI=
+fi
+
 cd $runpath/$name
 
-echo "Preparing initial data." >> $tracker
-
 # Prepare h5 with pressure and entropy
-$PYTHON $runpath/$name/Code/PScripts/generate_id.py $EOSpath $nthreads $frac $degree
+echo "Preparing initial data." >> $tracker
+$PYTHON $PY_SRC/generate_id.py $EOSpath $nthreads $frac $degree
 mv data.h5 $runpath/$name/
 
-# Entropy
-echo "Smoothing entropy..." >> $tracker
-date >> $tracker
-mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_LogEntropy >> $tracker
+for qty in O_LogEntropy O_LogPressure
+do
 
-# Pressure
-echo "Smoothing pressure..." >> $tracker
-date >> $tracker
-mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_LogPressure
+    echo "Smoothing $qty..." >> $tracker
+    date >> $tracker
+    $LAUNCHER $FILE $qty
+
+done
 
 echo "Computing derived quantities..." >> $tracker
-# Compute betaV
-$PYTHON $runpath/$name/Code/PScripts/computeQuantities.py $runpath/$name/data.h5 betaV
-# Compute kappaT
-$PYTHON $runpath/$name/Code/PScripts/computeQuantities.py $runpath/$name/data.h5 kappaT
-# Compute cV
-$PYTHON $runpath/$name/Code/PScripts/computeQuantities.py $runpath/$name/data.h5 cV
+for qty in betaV kappaT cV
+do
 
-# betaV
-echo "Smoothing betaV..." >> $tracker
-date >> $tracker
-mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_betaV
+    $PYTHON $PY_SRC/computeQuantities.py $FILE $qty
 
-# kappaT
-echo "Smoothing kappaT..." >> $tracker
-date >> $tracker
-mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_kappaT
+done
 
-# cV
-echo "Smoothing cV..." >> $tracker
-date >> $tracker
-mpiexec -n $nexec $runpath/$name/Code/bin/run $runpath/$name/data.h5 O_cV
+for qty in O_betaV O_kappaT O_cV
+do
+
+    echo "Smoothing $qty..." >> $tracker
+    date >> $tracker
+    $LAUNCHER $FILE $qty
+
+done
