@@ -49,7 +49,7 @@ def compCV(logtemp, entropy, pointsyq, pointstemp, pointsrho):
 fname = sys.argv[1]
 qty = sys.argv[2]
 
-with h5.Open(fname, 'r') as f:
+with h5.File(fname, 'r') as f:
     logtmp = f['logtemp'][()]
     lognb  = f['lognb'][()]
     ye     = f['ye'][()]
@@ -64,5 +64,5 @@ if qty == 'kappaT':
 if qty == 'cV':
     out == compCV(logtemp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
     
-with h5.Open(fname, 'w') as f:
+with h5.File(fname, 'w') as f:
     f.create_dataset('O_' + qty, data=out.T, compression='gzip', compression_opts=9)    
