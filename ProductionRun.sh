@@ -65,6 +65,7 @@ do
 done
 
 echo "Computing derived quantities..." >> $tracker
+date >> $tracker
 for qty in betaV kappaT cV
 do
 
