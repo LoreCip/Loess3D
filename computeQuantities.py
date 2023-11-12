@@ -52,7 +52,7 @@ qty = sys.argv[2]
 with h5.File(fname, 'r') as f:
     logtmp = f['logtemp'][()]
     lognb  = f['lognb'][()]
-    ye     = f['ye'][()]
+    ye     = f['Yq'][()]
 
     LogEntropy = f['LogEntropy'][()]
     LogPressure= f['LogPressure'][()]
@@ -63,6 +63,7 @@ if qty == 'kappaT':
     out = compKappaT(lognb, 10**LogPressure, len(ye), len(logtmp), len(lognb))
 if qty == 'cV':
     out == compCV(logtemp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
-    
+
+out = np.where(qy > 0, np.log10(qty), -15)
 with h5.File(fname, 'w') as f:
     f.create_dataset('O_' + qty, data=out.T, compression='gzip', compression_opts=9)    
