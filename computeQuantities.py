@@ -64,6 +64,6 @@ if qty == 'kappaT':
 if qty == 'cV':
     out == compCV(logtemp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
 
-out = np.where(qy > 0, np.log10(qty), -15)
+out = np.where(qty > 0, np.log10(qty), -15)
 with h5.File(fname, 'w') as f:
     f.create_dataset('O_' + qty, data=out.T, compression='gzip', compression_opts=9)    
