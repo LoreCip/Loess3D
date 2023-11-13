@@ -37,6 +37,8 @@ with h5.File(EOSpath, 'r') as f:
     entropy = entropy[np.ix_(points_n, points_m, points_l)]
     pressure = f['logpress'][()]
     pressure = pressure[np.ix_(points_n, points_m, points_l)]
+    energy = f['logenergy'][()]
+    energy = energy[np.ix_(points_n, points_m, points_l)]
 
 with h5.File('./completeData.h5', 'w') as f:
 
@@ -54,3 +56,4 @@ with h5.File('./completeData.h5', 'w') as f:
     f.create_dataset('lognb', data=lognb, compression='gzip', compression_opts=9)
     f.create_dataset('O_LogEntropy', data=entropy.T, compression='gzip', compression_opts=9)    
     f.create_dataset('O_LogPressure', data=pressure.T, compression='gzip', compression_opts=9)    
+    f.create_dataset('O_LogEnergy', data=energy.T, compression='gzip', compression_opts=9)    

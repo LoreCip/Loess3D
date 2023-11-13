@@ -55,7 +55,7 @@ echo "Preparing initial data." >> $tracker
 $PYTHON $PY_SRC/generate_id.py $EOSpath $nthreads $frac $degree
 mv data.h5 $runpath/$name/
 
-for qty in O_LogEntropy O_LogPressure
+for qty in O_LogEntropy O_LogPressure O_LogEnergy
 do
 
     echo "Smoothing $qty..." >> $tracker
@@ -66,7 +66,7 @@ done
 
 echo "Computing derived quantities..." >> $tracker
 date >> $tracker
-for qty in betaV kappaT cV
+for qty in betaV kappaT cV dPdE_nb
 do
 
     $PYTHON $PY_SRC/computeQuantities.py $FILE $qty
