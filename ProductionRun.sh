@@ -73,7 +73,7 @@ do
 
 done
 
-for qty in O_betaV O_kappaT O_cV
+for qty in O_betaV O_kappaT O_cV O_dPdE_nb
 do
 
     echo "Smoothing $qty..." >> $tracker
