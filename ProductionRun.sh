@@ -50,7 +50,7 @@ fi
 
 cd $runpath/$name
 
-# Prepare h5 with pressure and entropy
+# Prepare h5 with pressure, entropy and energy
 echo "Preparing initial data." >> $tracker
 $PYTHON $PY_SRC/generate_id.py $EOSpath $nthreads $frac $degree
 mv data.h5 $runpath/$name/

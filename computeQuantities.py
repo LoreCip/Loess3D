@@ -126,15 +126,16 @@ with h5.File(fname, 'r') as f:
 
     LogEntropy = f['LogEntropy'][()]
     LogPressure= f['LogPressure'][()]
+    LogEnergy  = f['LogEnergy'][()]
 
 if qty == 'betaV':
     out = compBetaV(lognb, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
 if qty == 'kappaT':
     out = compKappaT(lognb, 10**LogPressure, len(ye), len(logtmp), len(lognb))
 if qty == 'cV':
-    out == compCV(logtemp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
+    out == compCV(logtmp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
 if qty == 'dPdE_nb':
-    out = compdPdE_nb(logtemp, ye, 10**LogPressure, 10**LogEnergy, pointsyq, pointstemp, pointsrho)
+    out = compdPdE_nb(logtmp, ye, 10**LogPressure, 10**LogEnergy, pointsyq, pointstemp, pointsrho)
 
 out = np.where(out > 0, np.log10(out), -15)
 with h5.File(fname, 'a') as f:

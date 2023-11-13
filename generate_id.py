@@ -40,7 +40,7 @@ with h5.File(EOSpath, 'r') as f:
     energy = f['logenergy'][()]
     energy = energy[np.ix_(points_n, points_m, points_l)]
 
-with h5.File('./completeData.h5', 'w') as f:
+with h5.File('./data.h5', 'w') as f:
 
     # Scalars
     f['n'] = n
