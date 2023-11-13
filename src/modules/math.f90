@@ -6,8 +6,7 @@ module mathFunc
     implicit none (type, external)
     
     public :: compute_loess
-    private :: comp_coeff, comp_Ofit, comp_a, \
-               Quickselect, FindMedian
+    private :: comp_coeff, comp_Ofit, comp_a
 
 contains
 
@@ -37,7 +36,7 @@ contains
         bad(:) = .false.
         do p = 1, 10
             aerr(:) = abs(Ofit(:) - O(inds))
-            mad = FindMedian(aerr, npoints)
+            mad = median(aerr)
             uu = ( aerr(:) / (6_RK*mad) )**2_RK
 
             uu(:) = max(0.0_RK, min(uu(:), 1.0_RK))
@@ -126,46 +125,5 @@ contains
         coeff = b(:d)
 
     end subroutine comp_coeff
-
-    real(RK) recursive function Quickselect(arr, k) result(result)
-        real(RK), intent(in) :: arr(:)
-        integer, intent(in) :: k
-        real(RK), allocatable :: left(:), right(:), equal(:)
-        real(RK) :: pivot
-
-        if (size(arr) == 1) then
-            result = arr(1)
-            return
-        end if
-
-        pivot = arr(size(arr) / 2)
-        left = pack(arr, arr < pivot)
-        right = pack(arr, arr > pivot)
-        equal = pack(arr, arr == pivot)
-
-        if (k < size(left)) then
-            result = Quickselect(left, k)
-        elseif (k < size(left) + size(equal)) then
-            result = equal(1)
-        else
-            result = Quickselect(right, k - size(left) - size(equal))
-        end if
-    end function Quickselect
-
-    real(RK) function FindMedian(arr, n)
-        integer, intent(in) :: n
-        real(RK), intent(in) :: arr(n)
-        real(RK) :: left_median, right_median
-
-        if (mod(n,2) == 0) then
-            ! If the array has an even number of elements, the median is the average of the two middle elements.
-            left_median = Quickselect(arr, n / 2 - 1)
-            right_median = Quickselect(arr, n / 2)
-            FindMedian = (left_median + right_median) / 2.0
-        else
-            ! If the array has an odd number of elements, the median is the middle element.
-            FindMedian = Quickselect(arr, n / 2)
-        end if
-    end function FindMedian
 
 end module mathFunc

@@ -33,30 +33,30 @@ def compKappaT(lognb, pressure, pointsyq, pointstemp, pointsrho):
                 out[k,i,j] = firDer(pressure[k,i,j+1], pressure[k,i,j-1], Dx)
             out[k, i, -1] = (pressure[k,i,-1]-pressure[k,i,-2]) / (lognb[-1]-lognb[-2])
 
-    return np.where(kappa_T != 0, 1 / kappa_T, 0)
+    return np.where(out != 0, 1 / out, 0)
 
 @njit
 def compCV(logtemp, entropy, pointsyq, pointstemp, pointsrho):
     out = np.zeros((pointsyq, pointstemp, pointsrho))
     for k in range(pointsyq):
         for j in range(pointsrho):
-            out[k,0,j] = firDer(entropy[k,1,j], entropy[k,0,j], Dx)
+            out[k,0,j] = firDer(entropy[k,1,j], entropy[k,0,j], logtemp[1]-logtemp[0])
             for i in range(1, pointstemp-1):    
                 Dx = logtemp[i] - logtemp[i-1]
                 out[k,i,j] = firDer(entropy[k,i+1,j], entropy[k,i-1,j], Dx)
-            out[k,-1,j] = firDer(entropy[k,-1,j], entropy[k,-2,j], Dx)
+            out[k,-1,j] = firDer(entropy[k,-1,j], entropy[k,-2,j], logtemp[-1]-logtemp[-2])
     
     return out
 
 @njit
-def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
+def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho):
     out = np.zeros((pointsyq, pointstemp, pointsrho))
 
     for j in range(pointsrho):
         for k in range(pointsyq):
             for i in range(pointstemp):
 
-                if (i == 0) and (k != 0):
+                if (i == 0) and (k < pointsyq-1):
                     Dt = logtemp[i+1] - logtemp[i]
                     Dy = ye[k+1] - ye[k]
                     p1 = firDer(pressure[k,i+1,j], pressure[k,i,j], Dt/2)
@@ -64,7 +64,7 @@ def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
                     p3 = firDer(pressure[k+1,i,j], pressure[k-1,i,j], Dy)
                     p4 = firDer(energy[k+1,i,j], energy[k-1,i,j], Dy)
                 
-                elif (i != 0) and (k == 0):
+                elif (i < pointstemp-1) and (k == 0):
                     Dt = logtemp[i+1] - logtemp[i]
                     Dy = ye[k+1] - ye[k]
                     p1 = firDer(pressure[k,i+1,j], pressure[k,i-1,j], Dt)
@@ -80,7 +80,7 @@ def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
                     p3 = firDer(pressure[k+1,i,j], pressure[k,i,j], Dy/2)
                     p4 = firDer(energy[k+1,i,j], energy[k,i,j], Dy/2)
 
-                if (i == pointstemp) and (k != pointsyq):
+                if (i == pointstemp-1) and (k < pointsyq-1):
                     Dt = logtemp[i] - logtemp[i-1]
                     Dy = ye[k+1] - ye[k]
                     p1 = firDer(pressure[k,i,j], pressure[k,i-1,j], Dt/2)
@@ -88,7 +88,7 @@ def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
                     p3 = firDer(pressure[k+1,i,j], pressure[k-1,i,j], Dy)
                     p4 = firDer(energy[k+1,i,j], energy[k-1,i,j], Dy)
                 
-                elif (i != pointstemp) and (k == pointsyq):
+                elif (i < pointstemp-1) and (k == pointsyq-1):
                     Dt = logtemp[i+1] - logtemp[i]
                     Dy = ye[k] - ye[k-1]
                     p1 = firDer(pressure[k,i+1,j], pressure[k,i-1,j], Dt)
@@ -96,9 +96,9 @@ def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
                     p3 = firDer(pressure[k,i,j], pressure[k-1,i,j], Dy/2)
                     p4 = firDer(energy[k,i,j], energy[k-1,i,j], Dy/2)
 
-                elif (i == pointstemp) and (k == pointsyq):
-                    Dt = logtemp[i+1] - logtemp[i]
-                    Dy = ye[k+1] - ye[k]
+                elif (i == pointstemp-1) and (k == pointsyq-1):
+                    Dt = logtemp[i] - logtemp[i-1]
+                    Dy = ye[k] - ye[k-1]
                     p1 = firDer(pressure[k,i,j], pressure[k,i-1,j], Dt/2)
                     p2 = firDer(energy[k,i,j], energy[k,i-1,j], Dt/2)
                     p3 = firDer(pressure[k,i,j], pressure[k-1,i,j], Dy/2)
@@ -112,9 +112,15 @@ def compdPdE_nb(logtemp, ye, pressure, energy, pointsyq, pointstemp, pointsrho)
                     p3 = firDer(pressure[k+1,i,j], pressure[k-1,i,j], Dy)
                     p4 = firDer(energy[k+1,i,j], energy[k-1,i,j], Dy)
                 
+                if p2 == 0:
+                    p1 = 0
+                    p2 = 1
+                if p4 == 0:
+                    p3 = 0
+                    p4 = 1
                 out[k,i,j] = p1/p2 + p3/p4 # Nel caso usare i log di P ed E e moltiplicare out per P/E
 
-    return out
+    return out*10**pressure/10**energy
 
 fname = sys.argv[1]
 qty = sys.argv[2]
@@ -124,19 +130,20 @@ with h5.File(fname, 'r') as f:
     lognb  = f['lognb'][()]
     ye     = f['Yq'][()]
 
-    LogEntropy = f['LogEntropy'][()]
-    LogPressure= f['LogPressure'][()]
-    LogEnergy  = f['LogEnergy'][()]
+    LogEntropy = f['LogEntropy'][()].T
+    LogPressure= f['LogPressure'][()].T
+    LogEnergy  = f['LogEnergy'][()].T
 
 if qty == 'betaV':
     out = compBetaV(lognb, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
 if qty == 'kappaT':
     out = compKappaT(lognb, 10**LogPressure, len(ye), len(logtmp), len(lognb))
 if qty == 'cV':
-    out == compCV(logtmp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
+    out = compCV(logtmp, 10**LogEntropy, len(ye), len(logtmp), len(lognb))
 if qty == 'dPdE_nb':
-    out = compdPdE_nb(logtmp, ye, 10**LogPressure, 10**LogEnergy, pointsyq, pointstemp, pointsrho)
+    out = compdPdE_nb(logtmp, ye, LogPressure, LogEnergy, len(ye), len(logtmp), len(lognb))
 
 out = np.where(out > 0, np.log10(out), -15)
+out[np.isinf(out)] = -15
 with h5.File(fname, 'a') as f:
     f.create_dataset('O_' + qty, data=out.T, compression='gzip', compression_opts=9)    
