@@ -62,9 +62,9 @@ program loess3d
         totL = n*m*l
         allocate(x(n), y(m), z(l), Oin(n,m,l))
 
-        call read_from_hdf5(x, 'Yq', file_id, got, status)
-        call read_from_hdf5(y, 'logtemp', file_id, got, status)
-        call read_from_hdf5(z, 'lognb', file_id, got, status)
+        call read_from_hdf5(x, 'xx', file_id, got, status)
+        call read_from_hdf5(y, 'yy', file_id, got, status)
+        call read_from_hdf5(z, 'zz', file_id, got, status)
         call read_from_hdf5(Oin, trim(args(2)), file_id, got, status)
         call close_hdf5file(file_id, status)
 
