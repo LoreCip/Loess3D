@@ -1849,19 +1849,21 @@ contains
         xout = xin(inds)
     end subroutine psort_integer
 
-!!
-!!
-!!
-!!
+ !------------------------------------------------------------------------
+ !               MEDIAN ARRAYS                                       |
+ !------------------------------------------------------------------------
+ !--------------------------------------------------------------
+ !  Finds the median of XDONT using the recursive procedure
+ !  described in Knuth, The Art of Computer Programming,
+ !  vol. 3, 5.3.3 - This procedure is linear in time, and
+ !  does not require to be able to interpolate in the
+ !  set as the one used in INDNTH. It also has better worst
+ !  case behavior than INDNTH, but is about 30% slower in
+ !  average for random uniformly distributed values.
+ !---------------------------------------------------------------  
 
     Recursive Function D_valmed (XDONT) Result (res_med)
-!  Finds the median of XDONT using the recursive procedure
-!  described in Knuth, The Art of Computer Programming,
-!  vol. 3, 5.3.3 - This procedure is linear in time, and
-!  does not require to be able to interpolate in the
-!  set as the one used in INDNTH. It also has better worst
-!  case behavior than INDNTH, but is about 30% slower in
-!  average for random uniformly distributed values.
+
 ! __________________________________________________________
 ! __________________________________________________________
       Real (RK), Dimension (:), Intent (In) :: XDONT
