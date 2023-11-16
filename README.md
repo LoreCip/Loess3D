@@ -31,7 +31,7 @@ To build and run the `loess3d` program, you need the following:
    git clone https://github.com/yourusername/loess3d.git
    cd loess3d
 
-2. Edit the Makefile to set the appropriate compiler and compiler flags.
+2. Edit the Makefile to set the appropriate compiler and compiler flags (especially for MPI).
 
 3. Build the program:
 
@@ -65,5 +65,5 @@ The program outputs the smoothed data to an HDF5 file. The output file will cont
 If MPI is enabled, the program can be run in a parallel, distributed fashion. To run with MPI, use the following command:
 
 ```bash
-mpirun -n <num_processes> ./loess3d <input_file.h5> O_data
+mpirun -n <num_processes> ./bin/run <input_file.h5> O_data
 ```
