@@ -28,7 +28,7 @@ To build and run the `loess3d` program, you need the following:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/loess3d.git
+   git clone https://github.com/LoreCip/Loess3D.git
    cd loess3d
 
 2. Edit the Makefile to set the appropriate compiler and compiler flags (especially for MPI).
